@@ -2012,6 +2012,10 @@ enum ActivityType {
   COLLECTIVE_FROZEN
   COLLECTIVE_UNFROZEN
   COLLECTIVE_MEMBER_CREATED
+  COLLECTIVE_CORE_MEMBER_ADDED
+  COLLECTIVE_CORE_MEMBER_INVITED
+  COLLECTIVE_CORE_MEMBER_REMOVED
+  COLLECTIVE_CORE_MEMBER_EDITED
   COLLECTIVE_TRANSACTION_CREATED
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
@@ -2755,6 +2759,18 @@ type Host implements Account & AccountWithContributions {
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
   policies: [Policy]
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 
   """
   Number of unique financial contributors.
@@ -3565,6 +3581,27 @@ type VirtualCardCollection implements Collection {
 
 enum Policy {
   EXPENSE_AUTHOR_CANNOT_APPROVE
+}
+
+"""
+A collection of webhooks
+"""
+type WebhookCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Webhook]
+}
+
+"""
+An webhook attached to an account
+"""
+type Webhook {
+  id: String!
+  legacyId: Int!
+  activityType: ActivityType
+  webhookUrl: URL
+  account: Account!
 }
 
 """
@@ -4492,6 +4529,18 @@ type Bot implements Account {
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
   policies: [Policy]
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 }
 
 """
@@ -4904,6 +4953,18 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
   policies: [Policy]
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 
   """
   Returns the Fiscal Host
@@ -4918,7 +4979,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   How much platform fees are charged for this account
@@ -5001,7 +5062,7 @@ interface AccountWithHost {
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   Fees percentage that the platform takes for this collective
@@ -5640,6 +5701,18 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
   policies: [Policy]
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 
   """
   Returns the Fiscal Host
@@ -5654,7 +5727,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   How much platform fees are charged for this account
@@ -6158,6 +6231,18 @@ type Individual implements Account {
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
   policies: [Policy]
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
   email: String
   isGuest: Boolean!
   isFollowingConversation(id: String!): Boolean!
@@ -6704,6 +6789,18 @@ type Organization implements Account & AccountWithContributions {
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
   policies: [Policy]
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 
   """
   Number of unique financial contributors.
@@ -7238,6 +7335,18 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
   policies: [Policy]
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 
   """
   Returns the Fiscal Host
@@ -7252,7 +7361,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   How much platform fees are charged for this account
@@ -9674,6 +9783,18 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
   policies: [Policy]
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 
   """
   Returns the Fiscal Host
@@ -9688,7 +9809,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   How much platform fees are charged for this account
@@ -10200,6 +10321,18 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
   policies: [Policy]
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 
   """
   Returns the Fiscal Host
@@ -10214,7 +10347,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   How much platform fees are charged for this account
@@ -11391,6 +11524,9 @@ type Mutation {
     """
     virtualCard: VirtualCardReferenceInput!
   ): Boolean
+  createWebhook(webhook: WebhookCreateInput!): Webhook
+  updateWebhook(webhook: WebhookUpdateInput!): Webhook
+  deleteWebhook(webhook: WebhookReferenceInput!): Webhook
 }
 
 input CollectiveCreateInput {
@@ -12492,6 +12628,11 @@ input OrderUpdateInput {
   Amount intended as tip for the platform
   """
   platformTip: AmountInput
+
+  """
+  Host fee percent to be applied to the order
+  """
+  hostFeePercent: Float
 }
 
 """
@@ -12612,4 +12753,45 @@ enum VirtualCardProvider {
 
 input VirtualCardReferenceInput {
   id: String
+}
+
+"""
+Input type for Webhooks
+"""
+input WebhookCreateInput {
+  """
+  The account to attach the Webhook
+  """
+  account: AccountReferenceInput!
+  activityType: ActivityType! = ACTIVITY_ALL
+  webhookUrl: URL!
+}
+
+"""
+Input type to update a Webhook
+"""
+input WebhookUpdateInput {
+  """
+  The public id identifying the webhook (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The legacy public id identifying the webhook (ie: 4242)
+  """
+  legacyId: Int
+  activityType: ActivityType! = ACTIVITY_ALL
+  webhookUrl: URL!
+}
+
+input WebhookReferenceInput {
+  """
+  The public id identifying the webhook (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The legacy public id identifying the webhook (ie: 4242)
+  """
+  legacyId: Int
 }

@@ -18,6 +18,7 @@ import { OrderCollection } from '../collection/OrderCollection';
 import { TransactionCollection } from '../collection/TransactionCollection';
 import { UpdateCollection } from '../collection/UpdateCollection';
 import { VirtualCardCollection } from '../collection/VirtualCardCollection';
+import { WebhookCollection, WebhookCollectionArgs, WebhookCollectionResolver } from '../collection/WebhookCollection';
 import { AccountType, AccountTypeToModelMapping, ImageFormat, MemberRole } from '../enum';
 import { PaymentMethodService } from '../enum/PaymentMethodService';
 import { PaymentMethodType } from '../enum/PaymentMethodType';
@@ -565,6 +566,16 @@ const accountOrders = {
   },
 };
 
+const accountWebhooks = {
+  type: new GraphQLNonNull(WebhookCollection),
+  args: {
+    ...WebhookCollectionArgs,
+  },
+  async resolve(collective, args, req) {
+    return WebhookCollectionResolver({ account: { legacyId: collective.id }, ...args }, req);
+  },
+};
+
 export const AccountFields = {
   ...accountFieldsDefinition(),
   id: {
@@ -778,6 +789,7 @@ export const AccountFields = {
       return get(collective.data, 'categories', []);
     },
   },
+  webhooks: accountWebhooks,
 };
 
 export default Account;
